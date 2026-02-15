@@ -21,6 +21,7 @@ app.use(express.json());
 // Routes
 app.use('/api/mahasiswa', require('./routes/mahasiswa'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/analytics', require('./routes/analytics'));
 
 // Auth routes
 app.get('/api/auth/google', (req, res) => {

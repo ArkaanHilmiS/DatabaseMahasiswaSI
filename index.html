@@ -398,6 +398,18 @@
     <div class="prodi-list" id="prodiList"></div>
   </div>
 
+  <div class="sb-section">
+    <div class="sb-label">Statistik Akses</div>
+    <div class="sb-stat">
+      <div class="sb-num" id="sUniqueVisitors">—</div>
+      <div class="sb-lbl">Unique<br>Visitors</div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-num" id="sTotalVisits">—</div>
+      <div class="sb-lbl">Total<br>Page Views</div>
+    </div>
+  </div>
+
   <div class="sb-footer">
     <div class="sync-live"><div class="sync-dot"></div> Live dari Google Sheets</div>
     <div class="sync-time" id="syncTime">Belum disinkron</div>
@@ -814,12 +826,52 @@ function toast(msg,type=''){
   clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',3500);
 }
 
+// Visitor tracking
+function getVisitorId() {
+  let visitorId = localStorage.getItem('visitorId');
+  if (!visitorId) {
+    visitorId = 'vis_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('visitorId', visitorId);
+  }
+  return visitorId;
+}
+
+async function trackVisit() {
+  try {
+    const visitorId = getVisitorId();
+    await fetch('https://endless-elfie-tomass-291480c5.koyeb.app/api/analytics/visit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visitorId })
+    });
+  } catch (err) {
+    // Silent fail - analytics tidak menghalangi UI
+    console.log('Analytics tracking failed:', err);
+  }
+}
+
+async function loadVisitorStats() {
+  try {
+    const res = await fetch('https://endless-elfie-tomass-291480c5.koyeb.app/api/analytics/stats');
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('sUniqueVisitors').textContent = data.stats.uniqueVisitors;
+      document.getElementById('sTotalVisits').textContent = data.stats.totalVisits;
+    }
+  } catch (err) {
+    console.log('Failed to load visitor stats:', err);
+  }
+}
+
 // Auto-load on start
 load();
+trackVisit();
+loadVisitorStats();
 
 // Auto-refresh real-time setiap 5 detik
 setInterval(() => {
   load();
+  loadVisitorStats(); // Also refresh stats
 }, 5000);
 </script>
 </body>
