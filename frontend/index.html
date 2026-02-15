@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Login — Data Mahasiswa</title>
+  <!-- styling sama dengan dashboard, tambahkan tombol login Google -->
+</head>
+<body>
+  <div class="login-container">
+    <h1>Data<em>Mahasiswa</em></h1>
+    <p>Login dengan akun Google yang memiliki akses ke sistem</p>
+    <a href="https://nama-app.up.railway.app/api/auth/google" class="btn-google">
+      <img src="https://www.google.com/favicon.ico" alt="G">
+      Masuk dengan Google
+    </a>
+    <div id="error-msg"></div>
+  </div>
+  <script>
+    // Tampilkan error jika ada
+    const err = new URLSearchParams(window.location.search).get('error');
+    if (err === 'auth_failed') {
+      document.getElementById('error-msg').textContent =
+        'Login gagal. Pastikan kamu menggunakan akun yang terdaftar.';
+    }
+    // Kalau sudah login, langsung ke dashboard
+    if (localStorage.getItem('token')) {
+      window.location.href = '/dashboard.html';
+    }
+  </script>
+</body>
+</html>
