@@ -1,5 +1,7 @@
-if (process.env.NODE_ENV !== 'production') {
+try {
   require('dotenv').config();
+} catch(e) {
+  // production: env vars sudah diset di Koyeb
 }
 const express = require('express');
 const cors = require('cors');
