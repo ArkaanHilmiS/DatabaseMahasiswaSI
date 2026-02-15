@@ -1,5 +1,5 @@
 // Helper untuk semua request ke backend
-const BACKEND_URL = 'https://endless-elfie-tomass-291480c5.koyeb.app/'; // ganti ke URL Railway setelah deploy
+const BACKEND_URL = 'https://endless-elfie-tomass-291480c5.koyeb.app/health'; // ganti ke URL Railway setelah deploy
 
 const api = {
   getToken: () => localStorage.getItem('token'),
