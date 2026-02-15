@@ -542,7 +542,10 @@ async function load() {
   const btn = document.getElementById('btnR');
   btn.classList.add('loading');
   try {
-    const r = await fetch(CSV_URL + '&cb=' + Date.now());
+    const r = await fetch(CSV_URL + '&cb=' + Date.now(), {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+    });
     if (!r.ok) throw new Error(r.status);
     const txt = await r.text();
     const data = parseCSV(txt);
@@ -583,12 +586,13 @@ function parseCSV(txt) {
     .map(l => parseLine(l))
     .filter(c => c.some(x=>x.trim()))
     .map((c,i) => ({
-      nim: gc(c,idx.nim,`MHS${String(i+1).padStart(4,'0')}`),
-      nama: gc(c,idx.nama,'—'),
+      nim: gc(c,idx.nim,''),
+      nama: gc(c,idx.nama,''),
       prodi: gc(c,idx.prodi,'Tidak Diketahui'),
       angkatan: gc(c,idx.angkatan,'—'),
       status: normStatus(gc(c,idx.status,'Aktif')),
-    }));
+    }))
+    .filter(d => d.nim || d.nama);
 }
 function gc(c,i,fb){ if(i<0||i>=c.length) return fb; return c[i].trim().replace(/^"|"$/g,'')||fb; }
 function normStatus(s){
