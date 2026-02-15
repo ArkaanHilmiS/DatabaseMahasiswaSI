@@ -1,5 +1,5 @@
 // Helper untuk semua request ke backend
-const BACKEND_URL = 'https://endless-elfie-tomass-291480c5.koyeb.app/health';
+const BACKEND_URL = 'https://endless-elfie-tomass-291480c5.koyeb.app';
 
 const api = {
   getToken: () => localStorage.getItem('token'),
