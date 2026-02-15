@@ -206,7 +206,7 @@
 
   /* STATS */
   .stats-row {
-    display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px;
   }
   .sc {
     background:var(--paper2); border:1px solid var(--rule); border-radius:12px;
@@ -314,8 +314,6 @@
   .s-aktif .sdot { background:var(--green); }
   .s-tidakaktif { background:var(--amber-light); color:var(--amber); }
   .s-tidakaktif .sdot { background:var(--amber); }
-  .s-lulus { background:var(--accent-light); color:var(--accent); }
-  .s-lulus .sdot { background:var(--accent); }
 
   /* STATE BOXES */
   .sbox { padding:60px 24px; text-align:center; }
@@ -432,7 +430,6 @@
           <option value="">Semua</option>
           <option value="Aktif">Aktif</option>
           <option value="Tidak Aktif">Tidak Aktif</option>
-          <option value="Lulus">Lulus</option>
         </select>
       </div>
       <div class="fpill" id="pillProdi">
@@ -474,12 +471,6 @@
         <div class="sc-val" id="stTidakAktif">—</div>
         <div class="sc-sub">status tidak aktif</div>
         <div class="sc-line" style="background:linear-gradient(90deg,#d97706,#f59e0b)"></div>
-      </div>
-      <div class="sc">
-        <div class="sc-lbl">Sudah Lulus</div>
-        <div class="sc-val" id="stLulus">—</div>
-        <div class="sc-sub">status lulus</div>
-        <div class="sc-line" style="background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div>
       </div>
     </div>
 
@@ -611,7 +602,6 @@ function normStatus(s){
   const l=s.toLowerCase();
   if(l.includes('tidak aktif')||l.includes('tidakaktif')||l.includes('non-aktif')||l.includes('nonaktif')||l.includes('non aktif')) return 'Tidak Aktif';
   if(l.includes('aktif')) return 'Aktif';
-  if(l.includes('lulus')||l.includes('wisuda')||l.includes('selesai')) return 'Lulus';
   return s||'Aktif';
 }
 function parseLine(l){
@@ -633,10 +623,10 @@ function sidebar(){
   document.getElementById('sProdi').textContent = new Set(all.map(d=>d.prodi)).size;
   document.getElementById('sAngk').textContent = new Set(all.map(d=>d.angkatan).filter(a=>a!=='—')).size;
 
-  const sm={Aktif:0,'Tidak Aktif':0,Lulus:0};
+  const sm={Aktif:0,'Tidak Aktif':0};
   all.forEach(d=>{if(sm[d.status]!==undefined)sm[d.status]++;});
   const mx=Math.max(...Object.values(sm),1);
-  const sc={Aktif:'#34d399','Tidak Aktif':'#fcd34d',Lulus:'#6ea3ff'};
+  const sc={Aktif:'#34d399','Tidak Aktif':'#fcd34d'};
   document.getElementById('statusBars').innerHTML = Object.entries(sm).map(([s,n])=>`
     <div class="sbar-row">
       <div class="sbar-lbl">${s}</div>
@@ -717,7 +707,6 @@ function updateStats(){
   document.getElementById('stFiltered').textContent=filtered.length;
   document.getElementById('stAktif').textContent=filtered.filter(d=>d.status==='Aktif').length;
   document.getElementById('stTidakAktif').textContent=filtered.filter(d=>d.status==='Tidak Aktif').length;
-  document.getElementById('stLulus').textContent=filtered.filter(d=>d.status==='Lulus').length;
 }
 
 function renderChart(){
@@ -773,7 +762,7 @@ function renderTable(){
 
   document.getElementById('tBody').innerHTML=pg.map((d,i)=>{
     const pi=pl.indexOf(d.prodi); const pal=PAL[pi%PAL.length];
-    const sc=d.status==='Aktif'?'s-aktif':d.status==='Tidak Aktif'?'s-tidakaktif':'s-lulus';
+    const sc=d.status==='Aktif'?'s-aktif':'s-tidakaktif';
     return `<tr style="animation-delay:${i*.02}s">
       <td class="td-no">${start+i+1}</td>
       <td class="td-nim">${d.nim}</td>
@@ -839,27 +828,33 @@ function getVisitorId() {
 async function trackVisit() {
   try {
     const visitorId = getVisitorId();
-    await fetch('https://endless-elfie-tomass-291480c5.koyeb.app/api/analytics/visit', {
+    const BACKEND_URL = 'https://endless-elfie-tomass-291480c5.koyeb.app';
+    const res = await fetch(`${BACKEND_URL}/api/analytics/visit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ visitorId })
     });
+    console.log('Visit tracked:', await res.json());
   } catch (err) {
     // Silent fail - analytics tidak menghalangi UI
-    console.log('Analytics tracking failed:', err);
+    console.error('Analytics tracking failed:', err);
   }
 }
 
 async function loadVisitorStats() {
   try {
-    const res = await fetch('https://endless-elfie-tomass-291480c5.koyeb.app/api/analytics/stats');
+    const BACKEND_URL = 'https://endless-elfie-tomass-291480c5.koyeb.app';
+    const res = await fetch(`${BACKEND_URL}/api/analytics/stats`);
     const data = await res.json();
+    console.log('Visitor stats:', data);
     if (data.success) {
       document.getElementById('sUniqueVisitors').textContent = data.stats.uniqueVisitors;
       document.getElementById('sTotalVisits').textContent = data.stats.totalVisits;
+    } else {
+      console.error('Stats error:', data);
     }
   } catch (err) {
-    console.log('Failed to load visitor stats:', err);
+    console.error('Failed to load visitor stats:', err);
   }
 }
 
