@@ -35,7 +35,7 @@ app.get('/api/auth/google/callback', async (req, res) => {
   try {
     const { token, user } = await handleCallback(code);
     // Redirect ke frontend dengan token di URL (akan disimpan di localStorage)
-    res.redirect(`${process.env.FRONTEND_URL}/index.html?token=${token}&role=${user.role}`);
+    res.redirect(`${process.env.FRONTEND_URL}?token=${token}&role=${user.role}`);
   } catch (err) {
     console.error(err);
     res.redirect(`${process.env.FRONTEND_URL}?error=auth_failed`);
