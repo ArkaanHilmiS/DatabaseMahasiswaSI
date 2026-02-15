@@ -812,6 +812,11 @@ function toast(msg,type=''){
 
 // Auto-load on start
 load();
+
+// Auto-refresh real-time setiap 5 detik
+setInterval(() => {
+  load();
+}, 5000);
 </script>
 </body>
 </html>
